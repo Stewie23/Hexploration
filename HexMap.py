@@ -28,9 +28,16 @@ class Map:
         self.font = None
         self.color = None
         
+        self.TerrainList = []
+        
     def LoadMap(self):
+        #load terrain definitions first
+        self.loadTerrain()
+        
         #simple load the debug.map and parse it to draw map
-        map = open('map/debug.map','r')
+
+        
+        map = open('map/Debug/map.map','r')
         count = 0
         
         for line in map:
@@ -50,27 +57,44 @@ class Map:
                 element = line.split(',')
                 while n <= self.x:#dummy row
                     if n == 0:
-                        self.tiles[count-1][n] = Tile(n,count-1,99,self)#dummy
+                        self.tiles[count-1][n] = Tile(n,count-1,self.TerrainList[0],self)#dummy
                     else:
-                        self.tiles[count-1][n] = Tile(n,count-1,int(element[n-1]),self)
+                        self.tiles[count-1][n] = Tile(n,count-1,self.TerrainList[int(element[n-1])],self)
                         
                     n+=1
             count+= 1
-      
+        
+        map.close()
+         
+    def loadTerrain(self):
+        terrain = open('map/Debug/terrain','r')
+        #create dummy terrain
+        color = pygame.Color(0,0,0,0)
+        mTerrain = Terrain(0,"Dummy",color)
+        self.TerrainList.append(mTerrain)
+        #load terrain
+        id = 1
+        for line in terrain:
+            #values are seperated by ;
+            entry = line.split(';')
+            color = entry[1].split(',')
+            test = pygame.Color(int(color[0]),int(color[1]),int(color[2]),int(color[3]))
+            mTerrain = Terrain(id,entry[0],test)
+            id += 1
+            self.TerrainList.append(mTerrain)
+        terrain.close()
+              
     def drawHex(self,Tile,surface): 
         """
         Draw the tiles.
         """
     
-        color = pygame.Color(250,250, 250, 250) # for lines
+        color = pygame.Color(250,250,250,250) # for lines
         
-        bgcolor = None
-        if Tile.typ == 1:
-            bgcolor = pygame.Color(0,255,0,250)#green
-        if Tile.typ == 2:
-            bgcolor = pygame.Color(139,90,43,250)#brown
-        if Tile.typ == 3:
-            bgcolor = pygame.Color(184,184,184,250)#gray
+    
+        
+        bgcolor = Tile.terrain.getColor()
+       
             
         pygame.gfxdraw.filled_polygon(surface,Tile.pointlist,bgcolor)
         pygame.draw.aalines(surface, color,False, Tile.pointlist,1)
@@ -409,7 +433,7 @@ class Map:
         
 class Tile:
     
-    def __init__(self,x,y,typ,map):
+    def __init__(self,x,y,terrain,map):
         self.map = map
         #array position
         self.x = x
@@ -419,8 +443,7 @@ class Tile:
         self.hX = hPos[0]
         self.hY = hPos[1]
         #typ,for terrain
-        self.typ = typ
-        self.opacity = self.getOpacity()
+        self.terrain = terrain
         #calculate dimensions
         self.center = self.setCenter()
         self.pointlist = self.setPoints()
@@ -433,17 +456,7 @@ class Tile:
     def setCaption(self,caption):
         
         self.caption = self.map.font.render(caption,1,self.map.color)
-        
-    def getOpacity(self):
-        if self.typ == 1:
-            return 0.0
-        elif self.typ == 2:
-            return 0.25
-        elif self.typ == 3:
-            return 0.75
-        else:
-            return 0.0
-        
+               
     def setCenter(self):#calculate the center pixel of a hex
         if self.y % 2: #ungrade
             x = int((self.x +1) * self.map.height + self.map.offsetX)
@@ -521,3 +534,13 @@ class node: #class for pathfinding
         dZ = dY-dX
         return max((dX,dY,dZ))
 
+class Terrain: #stores color information etc. for tiles
+
+    def __init__(self,id,name,color):
+        self.id = id
+        self.name = name
+      
+        self.color = color
+        
+    def getColor(self):
+        return self.color

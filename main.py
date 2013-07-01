@@ -10,9 +10,7 @@ from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from customGuiElements import mTextListItem
 import HexMath,HexMap
-
-
-
+ 
 class Application:
     def __init__(self):
         pass       
@@ -40,12 +38,15 @@ class Application:
         #list
         mScrolledList = ScrolledList (200, 200)
         mScrolledList.selectionmode = SELECTION_SINGLE
-        mScrolledList.connect_signal (SIG_SELECTCHANGED, self.listselected,mScrolledList)
+        mScrolledList.connect_signal (SIG_SELECTCHANGED, self.terrainselected,mScrolledList)
         
-        item = mTextListItem ("Entry")
+        item = mTextListItem ("Wasser")
+        mScrolledList.items.append (item)
+        item = mTextListItem("Land")
+        mScrolledList.items.append (item)
+        item = mTextListItem("Kueste")
         mScrolledList.items.append (item)
         
-         
         self.renderer.add_widget(mScrolledList)
         
         # Blit the Renderer's contents at the desired position.
@@ -98,9 +99,9 @@ class Application:
         else:
             pass
        
-    def listselected(self,list):
+    def terrainselected(self,list):
         print list.get_selected()[0].get_text()
-      
+
         
 mApp = Application()
 mApp.init()
