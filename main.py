@@ -4,11 +4,10 @@ import sys, random
 import pygame, pygame.locals
 from ocempgui.draw import Draw
 from ocempgui.widgets import *
-from ocempgui.events import EventManager
 from ocempgui.widgets.Constants import *
 
 class Application:
-    def __init__(self):
+    def __init__(self):       
         self.move = True
         
     def Switch(self):
