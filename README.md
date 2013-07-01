@@ -1,7 +1,7 @@
 Hexploration
 ============
 
-Support programm for "An Fremden Gestaden" 
+Support program for "An Fremden Gestaden" 
 
 Windows:
 

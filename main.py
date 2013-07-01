@@ -13,46 +13,46 @@ import HexMath,HexMap
  
 class Application:
     def __init__(self):
+        self.selectedTerrain = None
         pass       
              
     def init(self):       
         self.initScreen()
         self.initHexMap()
         self.initWidgets()
-        
-        
+                
     def initScreen(self):
         # Initialize the drawing window.
         pygame.init ()
-        self.screen = pygame.display.set_mode ((400, 400))
+        self.screen = pygame.display.set_mode ((680, 680))
         self.screen.fill ((250, 250, 250))
         pygame.display.set_caption ('Hexploration')
            
         # Partial screen assignment for the Renderer.
         self.renderer = Renderer ()
-        surface = pygame.Surface ((200, 400))
+        surface = pygame.Surface ((480, 680))
         self.renderer.screen = surface
         self.renderer.color = 100, 100, 100
     
     def initWidgets(self):
         # Some widgets.
         #list
-        mScrolledList = ScrolledList (200, 200)
+   
+        mScrolledList = ScrolledList(200, 200)
         mScrolledList.selectionmode = SELECTION_SINGLE
         mScrolledList.connect_signal (SIG_SELECTCHANGED, self.terrainselected,mScrolledList)
+        
+        mScrolledList.topleft = 0,26
         
         for terrain in self.mMap.TerrainList:
             if terrain.name != "Dummy":
                 item = mTextListItem (terrain.name)
                 mScrolledList.items.append (item)
-                
-            
-      
-        
+                                
         self.renderer.add_widget(mScrolledList)
         
         # Blit the Renderer's contents at the desired position.
-        self.renderer.topleft = 200,0
+        self.renderer.topleft = 400,0
         self.screen.blit (self.renderer.screen, self.renderer.topleft)
         
         # Set up the tick event for timer based widgets.
@@ -96,13 +96,15 @@ class Application:
         #convert mouse to hex cords   
         ArrayCord =  HexMath.ScreenToHex(x, y,self.mMap.radius)
         #check if in grid
-        if HexMath.checkInGrid(ArrayCord[0],ArrayCord[1],self.mMap.x,self.mMap.y):
-            print ArrayCord
+        if HexMath.checkInGrid(ArrayCord[0],ArrayCord[1],self.mMap.x,self.mMap.y) and self.selectedTerrain != None:
+            tile = self.mMap.getTile(ArrayCord)
+            terrain = self.mMap.getTerrain(self.selectedTerrain)
+            tile.changeTerrain(self.mMap.getTerrain(self.selectedTerrain))           
         else:
             pass
        
     def terrainselected(self,list):
-        print list.get_selected()[0].get_text()
+        self.selectedTerrain = list.get_selected()[0].get_text()
 
         
 mApp = Application()

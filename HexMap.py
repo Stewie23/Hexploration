@@ -30,6 +30,8 @@ class Map:
         
         self.TerrainList = []
         
+        self.surface = None
+        
     def LoadMap(self):
         #load terrain definitions first
         self.loadTerrain()
@@ -83,7 +85,13 @@ class Map:
             id += 1
             self.TerrainList.append(mTerrain)
         terrain.close()
-              
+    
+    def getTerrain(self,string):
+        for terrain in self.TerrainList:
+            if terrain.name == string:
+                return terrain
+        return None    
+          
     def drawHex(self,Tile,surface): 
         """
         Draw the tiles.
@@ -91,7 +99,7 @@ class Map:
     
         color = pygame.Color(250,250,250,250) # for lines
         
-    
+
         
         bgcolor = Tile.terrain.getColor()
        
@@ -103,7 +111,9 @@ class Map:
         surface.blit(Tile.caption,Tile.center)    
      
     def drawMap(self,surface):
-
+        
+        self.surface = surface
+        
         surface.fill((104,104,104))
         iX = 1
         iY = 0
@@ -118,8 +128,8 @@ class Map:
         self.width = int(self.radius * 2)
         
     def getTile(self,Pos):
-        x = Pos[0]
-        y = Pos[1]
+        x = int(Pos[0])
+        y = int(Pos[1])
         
         return self.tiles[y][x]
     
@@ -452,7 +462,15 @@ class Tile:
         
         self.caption = None
         self.setCaption((str(self.x)+"," + str(self.y)))
-        
+     
+    def changeTerrain(self,terrain):
+        if terrain != self.terrain:
+            print terrain
+            self.terrain = terrain 
+            #redraw map
+            self.map.drawMap(self.map.surface)
+        else:
+            print "bar"   
     def setCaption(self,caption):
         
         self.caption = self.map.font.render(caption,1,self.map.color)
