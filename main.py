@@ -14,8 +14,8 @@ class Application:
         self.move = True
         
     def Switch(self):
-       pass
-    
+        print "Button!"
+        
     def init(self):       
         self.initScreen()
         self.initWidgets()
@@ -66,6 +66,13 @@ class Application:
             for event in events:
                 if event.type == pygame.locals.QUIT:
                     sys.exit ()
+                elif event.type == MOUSEMOTION:
+                    #set caption with mouse cords
+                    self.entry.set_text(str(event.pos[0]) + "," + str(event.pos[1]))
+                elif event.type == MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        #mouse picking                       
+                        self.HexGridMousePick(event.pos[0],event.pos[1])
             # Pass all events to the Renderer.
             self.renderer.distribute_events (*events)
    
@@ -73,7 +80,19 @@ class Application:
             self.screen.blit (self.renderer.screen, self.renderer.topleft)
             pygame.display.flip ()
             pygame.time.delay (30)
-        
+
+    def HexGridMousePick(self,x,y):
+        #addjust for offset of the hex grid
+        x -= self.mMap.offsetX
+        y -= self.mMap.offsetY     
+        #convert mouse to hex cords   
+        ArrayCord =  HexMath.ScreenToHex(x, y,self.mMap.radius)
+        #check if in grid
+        if HexMath.checkInGrid(ArrayCord[0],ArrayCord[1],self.mMap.x,self.mMap.y):
+            print ArrayCord
+        else:
+            print "Not in Grid"
+           
 mApp = Application()
 mApp.init()
 mApp.main()
