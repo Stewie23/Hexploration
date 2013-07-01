@@ -32,14 +32,14 @@ class Map:
         
         self.surface = None
         
-    def LoadMap(self):
+    def LoadMap(self,file ='map/Debug/map.map'):
         #load terrain definitions first
         self.loadTerrain()
         
         #simple load the debug.map and parse it to draw map
 
         
-        map = open('map/Debug/map.map','r')
+        map = open(file,'r')
         count = 0
         
         for line in map:
@@ -465,12 +465,11 @@ class Tile:
      
     def changeTerrain(self,terrain):
         if terrain != self.terrain:
-            print terrain
             self.terrain = terrain 
             #redraw map
             self.map.drawMap(self.map.surface)
         else:
-            print "bar"   
+            pass
     def setCaption(self,caption):
         
         self.caption = self.map.font.render(caption,1,self.map.color)
