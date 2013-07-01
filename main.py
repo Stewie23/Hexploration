@@ -17,8 +17,9 @@ class Application:
              
     def init(self):       
         self.initScreen()
-        self.initWidgets()
         self.initHexMap()
+        self.initWidgets()
+        
         
     def initScreen(self):
         # Initialize the drawing window.
@@ -40,12 +41,13 @@ class Application:
         mScrolledList.selectionmode = SELECTION_SINGLE
         mScrolledList.connect_signal (SIG_SELECTCHANGED, self.terrainselected,mScrolledList)
         
-        item = mTextListItem ("Wasser")
-        mScrolledList.items.append (item)
-        item = mTextListItem("Land")
-        mScrolledList.items.append (item)
-        item = mTextListItem("Kueste")
-        mScrolledList.items.append (item)
+        for terrain in self.mMap.TerrainList:
+            if terrain.name != "Dummy":
+                item = mTextListItem (terrain.name)
+                mScrolledList.items.append (item)
+                
+            
+      
         
         self.renderer.add_widget(mScrolledList)
         

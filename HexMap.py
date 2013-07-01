@@ -539,7 +539,6 @@ class Terrain: #stores color information etc. for tiles
     def __init__(self,id,name,color):
         self.id = id
         self.name = name
-      
         self.color = color
         
     def getColor(self):
