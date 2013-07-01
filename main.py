@@ -1,21 +1,22 @@
 # Embedding example of the Renderer in an own pygame mainloop with
 # partial screen assignment.
 import sys, random
+
 import pygame, pygame.locals
+import pygame.gfxdraw #we want to be able to use filled polys...
+
 from ocempgui.draw import Draw
 from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
+from customGuiElements import mTextListItem
 import HexMath,HexMap
-import pygame.gfxdraw #we want to be able to use filled polys...
+
 
 
 class Application:
-    def __init__(self):       
-        self.move = True
-        
-    def Switch(self):
-        print "Button!"
-        
+    def __init__(self):
+        pass       
+             
     def init(self):       
         self.initScreen()
         self.initWidgets()
@@ -36,13 +37,17 @@ class Application:
     
     def initWidgets(self):
         # Some widgets.
-        button = Button ("Stop/Go")
-        button.topleft = 10, 10
-        button.connect_signal (SIG_CLICKED,self.Switch)
-        self.entry = Entry ("Awesome...")
-        self.entry.topleft = 30, 50
-        self.renderer.add_widget (button, self.entry)
-    
+        #list
+        mScrolledList = ScrolledList (200, 200)
+        mScrolledList.selectionmode = SELECTION_SINGLE
+        mScrolledList.connect_signal (SIG_SELECTCHANGED, self.listselected,mScrolledList)
+        
+        item = mTextListItem ("Entry")
+        mScrolledList.items.append (item)
+        
+         
+        self.renderer.add_widget(mScrolledList)
+        
         # Blit the Renderer's contents at the desired position.
         self.renderer.topleft = 200,0
         self.screen.blit (self.renderer.screen, self.renderer.topleft)
@@ -68,7 +73,7 @@ class Application:
                     sys.exit ()
                 elif event.type == MOUSEMOTION:
                     #set caption with mouse cords
-                    self.entry.set_text(str(event.pos[0]) + "," + str(event.pos[1]))
+                    pass
                 elif event.type == MOUSEBUTTONDOWN:
                     if event.button == 1:
                         #mouse picking                       
@@ -91,8 +96,12 @@ class Application:
         if HexMath.checkInGrid(ArrayCord[0],ArrayCord[1],self.mMap.x,self.mMap.y):
             print ArrayCord
         else:
-            print "Not in Grid"
-           
+            pass
+       
+    def listselected(self,list):
+        print list.get_selected()[0].get_text()
+      
+        
 mApp = Application()
 mApp.init()
 mApp.main()
