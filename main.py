@@ -204,11 +204,29 @@ class Application:
                 self.mMap.SaveMap(entry.text)
                 self.createSimpleDialog("Gespeichert in....")
             else:
-                print "override"
+                self.override_filedialog(entry)
                     
         else:
             self.createSimpleDialog("Bitte Karten Namen eingeben")
-            
+      
+    def override_filedialog (self,entry):
+        buttons = [Button ("#OK"), Button ("#Cancel")]
+        buttons[0].minsize = 80, buttons[0].minsize[1]
+        buttons[1].minsize = 80, buttons[1].minsize[1]
+        results = [DLGRESULT_OK, DLGRESULT_CANCEL]
+    
+        dialog = GenericDialog("Karte Ueberschreinen Sicher?", buttons, results)
+        dialog.depth = 1 # Make it the top window.
+        dialog.topleft = 100, 20
+        
+        dialog.connect_signal (SIG_DIALOGRESPONSE, self.override, dialog,entry)
+        self.renderer.add_widget (dialog)
+     
+    def override(self,result,dialog,entry):
+        if result == 0:
+            self.mMap.SaveMap(entry.text)   
+        dialog.destroy()   
+           
     def getMaps(self):
         #get folders in /maps
         return os.listdir("map/")
@@ -227,10 +245,7 @@ class Application:
     #simple fucntion for destroying dialogs with just one option, after clicking          
     def simpleDialog(self,result,dialog):
         dialog.destroy()
-                
-            
-    
-        
+                        
 mApp = Application()
 mApp.init()
 mApp.main()
