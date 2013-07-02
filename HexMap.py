@@ -11,6 +11,7 @@ import HexMath
 
 import pygame, pygame.locals
 import pygame.gfxdraw #we want to be able to use filled polys...
+import os
 class Map:
     
     def __init__(self):
@@ -67,7 +68,32 @@ class Map:
             count+= 1
         
         map.close()
-         
+      
+    def SaveMap(self,name):
+        #create Folder, only if it does not exist allready
+        newpath = 'map/' + name
+        if not os.path.exists(newpath): os.makedirs(newpath)
+        #write map file
+        seperator = ","
+        f = open(newpath + "/map.map",'w')
+        f.write(str(self.x)+seperator+str(self.x)+seperator+str(self.radius)+seperator +"\n")
+        x = 0
+        n = 0
+        while x != self.x:
+            for entry in self.tiles[x] :
+                if n > 0:
+                    f.write(str(entry.terrain.id)+seperator)
+                else:
+                    n += 1
+            f.write("\n")
+            n=0
+            x+=1
+            
+        f.close()
+        #write terrain file
+        f = open(newpath + "/terrain",'w')
+        f.close()
+        
     def loadTerrain(self):
         terrain = open('map/Debug/terrain','r')
         #create dummy terrain

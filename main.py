@@ -10,11 +10,12 @@ from ocempgui.widgets import *
 from ocempgui.widgets.Constants import *
 from customGuiElements import mTextListItem
 import HexMath,HexMap
+import os
  
 class Application:
     def __init__(self):
         self.selectedTerrain = None
-        self.file = None
+        self.Loadfile = None
                  
     def init(self):       
         self.initScreen()
@@ -49,15 +50,10 @@ class Application:
                 item = mTextListItem (terrain.name)
                 mScrolledList.items.append (item)
                 
-        buttons = [Button ("Load"), Button ("#Save")]
-        buttons[0].minsize = 80, buttons[0].minsize[1]
-        buttons[0].topleft = 0,300
-        buttons[0].connect_signal (SIG_CLICKED,self.LoadHexMap,self.renderer)
-        buttons[1].minsize = 80, buttons[1].minsize[1]
-        buttons[1].topleft = 90,300
         
+  
                                 
-        self.renderer.add_widget(mScrolledList,self.create_file_view(self.renderer),buttons[0],buttons[1])
+        self.renderer.add_widget(mScrolledList,self.create_file_view(self.renderer),self.create_save_file_widget())
         
         # Blit the Renderer's contents at the desired position.
         self.renderer.topleft = 400,0
@@ -121,13 +117,16 @@ class Application:
         
         
         
-        hframe2 = HFrame (Label ("Save/Load Hexmap"))
+        hframe2 = HFrame (Label ("Load Hexmap"))
         label = Label ("Selection:")
         entry = Entry ()
         entry.minsize = 200, entry.minsize[1]
         button = Button ("#Browse")
         button.connect_signal (SIG_CLICKED, self.open_filedialog, renderer, entry)
-        hframe2.add_child (label, entry, button)
+        button1 = Button ("Load")
+        button1.topleft = 0,300
+        button1.connect_signal (SIG_CLICKED,self.LoadHexMap,self.renderer)
+        hframe2.add_child (label, entry, button,button1)
         table.add_child (0, 1, hframe2)
         
         table.set_row_align (0, ALIGN_TOP)
@@ -151,31 +150,69 @@ class Application:
         string = ""
         if result == DLGRESULT_OK:
             string = "".join(["\"%s\"" % f for f in dialog.get_filenames ()])
-            self.file = string
+            self.Loadfile = string
         else:
             string = "Nothing selected"
-            self.file = None
+            self.Loadfile = None
         dialog.destroy ()
         entry.text = string
 
+    def create_save_file_widget(self):
+        table = Table (1, 2)
+        
+        hframe2 = HFrame (Label ("Save Hexmap"))
+        label = Label ("Map Name:")
+        entry = Entry ()
+        entry.minsize = 200, entry.minsize[1]
+        button = Button ("Save")
+        button.topleft = 0,300
+        button.connect_signal (SIG_CLICKED,self.SaveHexMap,entry)
+        hframe2.add_child (label, entry,button)
+        table.add_child (0, 1, hframe2)
+        
+        table.set_row_align (0, ALIGN_TOP)
+        table.topleft = 0,300
+        return table  
+        
     def LoadHexMap(self,renderer):
         #make sure file ends with .map
         ending = 'map"'
-        if self.file != None:
-            check = self.file.split('\\')
+        if self.Loadfile != None:
+            check = self.Loadfile.split('\\')
             check = check[len(check)-1].split('.')
             if len(check) > 1:
                 if check[1] == ending: 
                     #we should have a legit .map file, so 
-                    self.file = self.file.strip('"')
-                    self.mMap.LoadMap(self.file)
+                    self.Loadfile = self.Loadfile.strip('"')
+                    self.mMap.LoadMap(self.Loadfile)
                     self.mMap.drawMap(self.screen)
                     self.createSimpleDialog("Erfolgreich geladen")
                 else:
                     self.createSimpleDialog("Bitte .map Datein auswaehlen")
             else:
-                self.createSimpleDialog("Bitte .map Datein auswaehlen")         
-    
+                self.createSimpleDialog("Bitte .map Datein auswaehlen")   
+                
+    def SaveHexMap(self,entry): 
+        if entry.text:
+            #check if map allready exists, if yes ask if override, else save
+            override = False
+            for folder in self.getMaps():
+                if entry.text == folder:
+                    override = True
+                    break
+            if not override:
+                self.mMap.SaveMap(entry.text)
+                self.createSimpleDialog("Gespeichert in....")
+            else:
+                print "override"
+                    
+        else:
+            self.createSimpleDialog("Bitte Karten Namen eingeben")
+            
+    def getMaps(self):
+        #get folders in /maps
+        return os.listdir("map/")
+                   
     #creating simple dialogs (with just one option for the user)
     def createSimpleDialog(self,caption):
         buttons = [Button ("OK")]
@@ -186,6 +223,7 @@ class Application:
         dialog.topleft = 100, 20
         self.renderer.add_widget (dialog)
         dialog.connect_signal(SIG_DIALOGRESPONSE,self.simpleDialog,dialog) 
+        
     #simple fucntion for destroying dialogs with just one option, after clicking          
     def simpleDialog(self,result,dialog):
         dialog.destroy()
@@ -196,3 +234,4 @@ class Application:
 mApp = Application()
 mApp.init()
 mApp.main()
+
