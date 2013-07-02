@@ -80,7 +80,7 @@ class Map:
         x = 0
         n = 0
         while x != self.x:
-            for entry in self.tiles[x] :
+            for entry in  self.tiles[x] :
                 if n > 0:
                     f.write(str(entry.terrain.id)+seperator)
                 else:
@@ -92,6 +92,11 @@ class Map:
         f.close()
         #write terrain file
         f = open(newpath + "/terrain",'w')
+        for terrain in self.TerrainList:
+            if terrain.id != 0:
+                color = str(terrain.color).strip("(")
+                color = color.strip(")")
+                f.write(terrain.name + ";" + color + "\n")
         f.close()
         
     def loadTerrain(self):
